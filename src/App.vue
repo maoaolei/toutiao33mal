@@ -1,10 +1,6 @@
 <template>
   <div>
-    <van-button type="primary">主要按钮</van-button>
-    <van-button type="primary">主要按钮</van-button>
-    <van-button type="primary">主要按钮</van-button>
-    <span class="toutiao toutiao-gengduo"></span>
-    <div class="login">登录</div>
+    <router-view></router-view>
   </div>
 </template>
 
