@@ -31,6 +31,7 @@
 </template>
 
 <script>
+import dayjs from '@/utils/dayjs'
 export default {
   // 默认返回的话对象要返回一个函数
   props: {
@@ -43,7 +44,7 @@ export default {
     /* eslint-disable */
     label() {
       const { aut_name, comm_count, pubdate } = this.article
-      return `${aut_name} ${comm_count}评论 ${pubdate}`
+      return `${aut_name} ${comm_count}评论 ${dayjs(pubdate).fromNow()}`
     }
   }
 }
