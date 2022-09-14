@@ -14,16 +14,17 @@ export default new Vuex.Store({
       key: 'HEIMA_TOUTIAO',
       // storage: window.sessionStorage,
       // 默认接收一个state
-      reducer({ tokenObj }) {
+      reducer({ tokenObj, myChannels }) {
         return {
-          tokenObj
+          tokenObj,
+          myChannels
         }
       }
     })
   ],
   state: {
     tokenObj: {},
-    a: 1
+    myChannels: []
   },
   // 相当于vue里面的计算属性 computed
   getters: {
@@ -34,6 +35,9 @@ export default new Vuex.Store({
   mutations: {
     SET_TOKEN(state, token) {
       state.tokenObj = token
+    },
+    SET_MY_CHANNELS(state, channels) {
+      state.myChannels = channels
     }
   },
   actions: {},

@@ -23,17 +23,21 @@
       :style="{ height: '97%' }"
     >
       <channel-edit
+        v-if="isShow"
         @change-active=";[(isShow = false), (active = $event)]"
         :my-channels="channels"
+        @del-channel="delChannel"
+        @add-channel="addChannel"
       ></channel-edit>
     </van-popup>
   </div>
 </template>
 
 <script>
-import { getChannelAPI } from '@/api'
+import { getChannelAPI, delChannelsAPI, addChannelAPI } from '@/api'
 import ArticleList from './components/ArticleList.vue'
 import ChannelEdit from './components/ChannelEdit.vue'
+import { mapGetters, mapMutations } from 'vuex'
 export default {
   name: 'Home',
   components: { ArticleList, ChannelEdit },
@@ -45,11 +49,29 @@ export default {
     }
   },
   created() {
-    this.getChannel()
+    this.initChannels()
+  },
+  computed: {
+    ...mapGetters(['isLogin'])
   },
   // ?? ==> 相当于 || 常用语语句 只检测null和undefined
   // ?. ==> 可选链操作符  ?前面是Undefined,那么不会取后面的值
   methods: {
+    ...mapMutations(['SET_MY_CHANNELS']),
+    // 两套系统 如果登录调接口 用自己的数据
+    // 没登录 本地有用本地  本地没有调接口获取默认数据
+    initChannels() {
+      if (this.isLogin) {
+        this.getChannel()
+      } else {
+        const myChannels = this.$store.state.myChannels
+        if (myChannels.length === 0) {
+          this.getChannel()
+        } else {
+          this.channels = myChannels
+        }
+      }
+    },
     async getChannel() {
       try {
         const { data } = await getChannelAPI()
@@ -61,6 +83,44 @@ export default {
         } else {
           const status = error.response.status
           status === 507 && this.$toast.fail('服务器异常,请刷新重试')
+        }
+      }
+    },
+    async delChannel(id) {
+      try {
+        const newChannels = this.channels.filter((item) => item.id !== id)
+        // 发送求情删除频道
+        if (this.isLogin) {
+          await delChannelsAPI(id)
+        } else {
+          this.SET_MY_CHANNELS(newChannels)
+        }
+        // 删除视图层
+        this.channels = newChannels
+        this.$toast.success('删除成功')
+      } catch (error) {
+        if (error.response && error.response.status === 401) {
+          this.$toast.fail('请登录再删除')
+        } else {
+          throw error
+        }
+      }
+    },
+    async addChannel(item) {
+      try {
+        if (this.isLogin) {
+          await addChannelAPI(item.id, this.channels.length)
+        } else {
+          this.SET_MY_CHANNELS([...this.channels, item])
+        }
+        // 添加视图层
+        this.channels.push(item)
+        this.$toast.success('添加成功')
+      } catch (error) {
+        if (error.response && error.response.status === 401) {
+          this.$toast.fail('请登录再添加')
+        } else {
+          throw error
         }
       }
     }
