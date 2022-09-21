@@ -20,6 +20,12 @@
           v-for="item in acticles"
           :key="item.art_id"
           :article="item"
+          @click.native="
+            $router.push({
+              path: '/detail',
+              query: { article_id: item.art_id }
+            })
+          "
         ></article-item>
       </van-list>
     </van-pull-refresh>
@@ -53,6 +59,7 @@ export default {
     async getFirstPageArticle() {
       try {
         const { data } = await getArticle(this.id, +new Date())
+        console.log(data)
         this.acticles = data.data.results
         this.preTimestamp = data.data.pre_timestamp
       } catch (error) {

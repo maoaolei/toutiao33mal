@@ -29,7 +29,11 @@
               justify="space-around"
               align="center"
               style="height: 100%"
-              ><van-button round size="mini" class="edit-btn"
+              ><van-button
+                round
+                size="mini"
+                class="edit-btn"
+                @click="$router.push('/user')"
                 >编辑资料</van-button
               ></van-row
             >
